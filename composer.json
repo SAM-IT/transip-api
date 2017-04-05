@@ -14,9 +14,6 @@
         "wsdl2phpgenerator/wsdl2phpgenerator": "^3.4"
     },
     "autoload": {
-        "classmap": [
-            "src/imported"
-        ],
         "psr-4": {
             "SamIT\\TransIP\\": [
                 "src/generated",
