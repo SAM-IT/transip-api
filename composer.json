@@ -1,0 +1,34 @@
+{
+    "name": "sam-it/transip-api",
+    "description": "Generated API client",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sam Mousa",
+            "email": "sam@mousa.nl"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "wsdl2phpgenerator/wsdl2phpgenerator": "^3.4"
+    },
+    "autoload": {
+        "classmap": [
+            "src/imported"
+        ],
+        "psr-4": {
+            "SamIT\\TransIP\\": [
+                "src/generated",
+                "src/"
+            ]
+        }
+
+    },
+    "config": {
+      "preferred-install": "dist",
+      "vendor-dir": "src/vendor",
+      "bin-dir": "bin"
+
+    }
+}
