@@ -11,7 +11,7 @@ namespace SamIT\TransIP;
  */
 class SoapClient extends \SoapClient
 {
-    public $privateKey;
+    private $privateKey;
     private $endpoint;
 
     public function __construct($wsdl, array $options = null)
