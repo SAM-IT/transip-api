@@ -57,17 +57,16 @@ class SoapClient extends \SoapClient
 
 
         $service = strtr(substr($class, strrpos($class, '\\') + 1), ['ServiceService' => 'Service']);
-
         $this->__setCookie('timestamp', $timestamp = time());
         $this->__setCookie('nonce', $nonce = uniqid('', true));
-        $this->__setCookie('signature', $this->urlEncode($this->sign([
+        $this->__setCookie('signature', $this->urlEncode($this->sign(array_merge($arguments, [
             '__method' => $function_name,
             '__service' => $service,
             '__hostname' => $this->endpoint,
             '__timestamp' => $timestamp,
             '__nonce' => $nonce,
 
-        ])));
+        ]))));
         return parent::__soapCall($function_name, $arguments, $options, $input_headers, $output_headers);
     }
 
