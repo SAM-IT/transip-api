@@ -2,13 +2,8 @@
 
 namespace SamIT\TransIP;
 
-class ServiceFactory
+class ServiceFactory extends BaseFactory
 {
-
-    public function __construct($defaultOptions = [])
-    {
-        $this->defaultOptions = $defaultOptions;
-    }
 
     /**
      * @param array $options The options for the SoapClient
@@ -16,7 +11,7 @@ class ServiceFactory
      */
     public function getColocationService(array $options = [])
     {
-        return new ColocationService(array_merge($this->defaultOptions, $options));
+        return $this->constructService(ColocationService::class, $options);
     }
 
     /**
@@ -25,7 +20,7 @@ class ServiceFactory
      */
     public function getDomainService(array $options = [])
     {
-        return new DomainService(array_merge($this->defaultOptions, $options));
+        return $this->constructService(DomainService::class, $options);
     }
 
     /**
@@ -34,7 +29,7 @@ class ServiceFactory
      */
     public function getForwardService(array $options = [])
     {
-        return new ForwardService(array_merge($this->defaultOptions, $options));
+        return $this->constructService(ForwardService::class, $options);
     }
 
     /**
@@ -43,7 +38,7 @@ class ServiceFactory
      */
     public function getHaipService(array $options = [])
     {
-        return new HaipService(array_merge($this->defaultOptions, $options));
+        return $this->constructService(HaipService::class, $options);
     }
 
     /**
@@ -52,7 +47,7 @@ class ServiceFactory
      */
     public function getVpsService(array $options = [])
     {
-        return new VpsService(array_merge($this->defaultOptions, $options));
+        return $this->constructService(VpsService::class, $options);
     }
 
     /**
@@ -61,7 +56,7 @@ class ServiceFactory
      */
     public function getWebhostingService(array $options = [])
     {
-        return new WebhostingService(array_merge($this->defaultOptions, $options));
+        return $this->constructService(WebhostingService::class, $options);
     }
 
 }

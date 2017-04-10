@@ -31,9 +31,8 @@ $prefix = 'https://api.transip.nl/wsdl/?service={service}';
 $generator = new \Wsdl2PhpGenerator\Generator();
 
 passthru('rm -rf ' .  __DIR__ . '/src/generated/*');
-$factory = new \Wsdl2PhpGenerator\PhpSource\PhpClass('ServiceFactory');
+$factory = new \Wsdl2PhpGenerator\PhpSource\PhpClass('ServiceFactory', false, 'BaseFactory');
 
-$factory->addFunction($c = new \Wsdl2PhpGenerator\PhpSource\PhpFunction('public', '__construct', '$defaultOptions = []', '    $this->defaultOptions = $defaultOptions;'));
 foreach ($services as $service) {
     $generator->generate(new \Wsdl2PhpGenerator\Config([
         'inputFile' => strtr($prefix, ['{service}' => $service]),
@@ -47,9 +46,16 @@ foreach ($services as $service) {
     $comment->setReturn(new \Wsdl2PhpGenerator\PhpSource\PhpDocElement('return', $service, '', 'A SoapClient instance for the ' . $service));
 
 
-    $factory->addFunction(new \Wsdl2PhpGenerator\PhpSource\PhpFunction(
-        'public', 'get' . $service, 'array $options = []', "    return new $service(array_merge(\$this->defaultOptions, \$options));", $comment));
+    $getter = new \Wsdl2PhpGenerator\PhpSource\PhpFunction(
+        'public',
+        'get' . $service,
+        'array $options = []',
 
+        "    return \$this->constructService({$service}::class, \$options);",
+        $comment
+    );
+
+    $factory->addFunction($getter);
 
 }
 
