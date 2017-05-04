@@ -6,7 +6,7 @@ namespace SamIT\TransIP;
 /**
  * Class SoapClient
  * SoapClient that implements the Transip request signing logic.
- * The encryption / encoding related functions have been taking from the API package available at https://www.transip.nl/transip/api/
+ * The encryption / encoding related functions have been taken from the API package available at https://www.transip.nl/transip/api/
  * @package SamIT\TransIP
  */
 class SoapClient extends \SoapClient
@@ -72,7 +72,7 @@ class SoapClient extends \SoapClient
 
         $digest = $this->digestSha512Asn1($this->encodeParameters($params));
         if(!@openssl_private_encrypt($digest, $signature, $key))
-            die('<p>Could not sign your request, please supply your private key in the ApiSettings file. You can request a new private key in your TransIP Controlpanel.</p>');
+            die('<p>Could not sign your request, please supply a valid private key. You can request a new private key in your TransIP Controlpanel.</p>');
 
         return base64_encode($signature);
     }
@@ -89,27 +89,45 @@ class SoapClient extends \SoapClient
         if(!is_array($parameters) && !is_object($parameters))
             return $this->urlEncode($parameters);
 
-        $encodedData = array();
+        $encodedData = [];
 
         foreach($parameters as $key => $value)
         {
-            $encodedKey = is_null($keyPrefix)
-                ? $this->urlEncode($key)
-                : $keyPrefix . '[' . $this->urlEncode($key) . ']';
+            $encodedData[] = $this->encodeParam($key, $value, $keyPrefix);
+        }
 
-            if(is_array($value) || is_object($value))
-            {
-                $encodedData[] = $this->encodeParameters($value, $encodedKey);
+        // Also loop over getters.
+        if (is_object($parameters) && empty($encodedData)) {
+            foreach ((new \ReflectionClass($parameters))->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
+                if ($reflectionMethod->getNumberOfRequiredParameters() === 0 && strncmp($reflectionMethod->getName(), 'get', 3) === 0) {
+                    $key = lcfirst(substr($reflectionMethod->getName(), 3));
+                    $value = $reflectionMethod->invoke($parameters);
+                    $encodedData[] = $this->encodeParam($key, $value, $keyPrefix);
+
+                }
             }
-            else
-            {
-                $encodedData[] = $encodedKey . '=' . $this->urlEncode($value);
-            }
+
         }
 
         return implode('&', $encodedData);
     }
 
+
+    private function encodeParam($key, $value, $keyPrefix)
+    {
+        $encodedKey = is_null($keyPrefix)
+            ? $this->urlEncode($key)
+            : $keyPrefix . '[' . $this->urlEncode($key) . ']';
+
+        if(is_array($value) || is_object($value))
+        {
+            return $this->encodeParameters($value, $encodedKey);
+        }
+        else
+        {
+            return $encodedKey . '=' . $this->urlEncode($value);
+        }
+    }
     /**
      * Our own function to encode a string according to RFC 3986 since.
      * PHP < 5.3.0 encodes the ~ character which is not allowed.
